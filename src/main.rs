@@ -8,6 +8,8 @@ use {
     },
 };
 
+const DAYS: u16 = const { 7 * 53 };
+
 #[derive(Debug, clap::Parser)]
 #[command(version, about, long_about = None)]
 struct Args {
@@ -52,6 +54,11 @@ fn draw_repeating_pattern(git: &GitInfo, columns: &[[u8; 7]], dates: RangeInclus
             .expect("Internal error: ran out of pixels (should repeat endlessly)");
 
         let () = draw_pixel(git, pixel, date);
+
+        println!(
+            "{:3}% ({date})",
+            date.signed_duration_since(start_date).num_days() * 100 / i64::from(DAYS),
+        );
 
         date = match date.checked_add_days(Days::new(1)) {
             Some(some) => some,
@@ -197,7 +204,7 @@ fn main() {
         }
     };
     let a_year_ago = {
-        let a_year = Days::new(const { 7 * 53 }); // Rounded up to the nearest week.
+        let a_year = Days::new(u64::from(DAYS)); // Rounded up to the nearest week.
         match date.checked_sub_days(a_year) {
             Some(some) => some,
             None => panic!("Couldn't subtract {a_year:?} from {date}"),
